@@ -26,8 +26,8 @@ void Game::wait_clients() {
 }
 
 void Game::start_game() {
-	Network &network = Network::Instance();
 	Map DataMap;
+	Network &network = Network::Instance();
 	DataMap.LoadMap(network.max_clients);
 	speed_tank = 1;
 	speed_bullet = 2;
@@ -41,20 +41,34 @@ void Game::start_game() {
 	while (GameOn){
 		std::vector<sf::Vector2<float>> PacketPointsTanks;
 		std::vector<sf::Vector2<float>> PacketPointsBullets;
-		gameMutex.lock();
+		std::vector<RouteObject> route_tanks;
 
+		gameMutex.lock();
+		for (unsigned i = 0; i < network.tanks.size(); i++) {
+			MoveBullets(network.tanks[i].bullets, speed_bullet);
+		}
+		gameMutex.unlock();
+
+		gameMutex.lock();
 		for (unsigned i = 0; i < network.tanks.size(); i++) {
 			PacketPointsTanks.push_back(network.tanks[i].point);
+			route_tanks.push_back(network.tanks[i].turn);
+			
 			for (unsigned j = 0; j < network.tanks[i].bullets.size(); j++) {
 				PacketPointsTanks.push_back(network.tanks[i].bullets[j].point);
 			}
 		}
-
-		for (unsigned i = 0; i < network.clients.size(); i++) {
-			network.clients[i]->SendDataPacket(DataMap, PacketPointsTanks, PacketPointsBullets, i);
-		}
-
 		gameMutex.unlock();
+
+		//std::cout << "PACKET  " << PacketPointsTanks[0].x << PacketPointsTanks[0].y;
+
+		gameMutex.lock();
+		for (unsigned i = 0; i < network.clients.size(); i++) {
+			network.clients[i]->SendDataPacket(DataMap, PacketPointsTanks, PacketPointsBullets, route_tanks,  i);
+		}
+		gameMutex.unlock();
+
+		
 	}
 }
 
@@ -76,7 +90,7 @@ void Game::end_game() {
 	return;
 }
 
-void Game::ImportToGame(int key_tank, int key_bullet, unsigned id) {		
+/*void Game::ImportToGame(int key_tank, int key_bullet, unsigned id) {		
 	gameMutex.lock();
 
 	Network &network = Network::Instance();
@@ -91,4 +105,22 @@ void Game::ImportToGame(int key_tank, int key_bullet, unsigned id) {
 	MoveBullets(network.tanks[id].bullets, speed_bullet);
 
 	gameMutex.unlock();
+}*/
+
+void Game::ImportToGame(int key, unsigned id) {		
+	Network &network = Network::Instance();
+	
+	if (key == RouteObject::Space) {
+		gameMutex.lock();
+		Bullet bullet = Bullet(network.tanks[id].point.x, 
+			network.tanks[id].point.y, network.tanks[id].turn, network.tanks[id].team); 
+		network.tanks[id].bullets.push_back(bullet);
+		gameMutex.unlock();
+	}
+	else{
+		gameMutex.lock();
+		MoveTank(network.tanks[id], key, speed_tank);
+		std::cout << network.tanks[id].point.x << "   " << network.tanks[id].point.y << std::endl;
+		gameMutex.unlock();
+	}
 }

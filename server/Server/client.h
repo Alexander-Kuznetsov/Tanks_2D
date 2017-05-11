@@ -21,7 +21,8 @@ class Client {
 		Client(unsigned ind);
 
 		void wait_connect(sf::TcpListener &listener);
-		void GetDataPacket(int &key_tanks, int &key_bullet);
+		//void GetDataPacket(int &key_tanks, int &key_bullet);
+		void GetDataPacket(int &key);
 		void SendDataPacket(Map DataMap, std::vector<sf::Vector2<float>> 
-			&PacketPointsTanks, std::vector<sf::Vector2<float>> &PacketPointsBullets, unsigned id);
+			&PacketPointsTanks, std::vector<sf::Vector2<float>> &PacketPointsBullets, std::vector<RouteObject> &route_tanks, unsigned id);
 };

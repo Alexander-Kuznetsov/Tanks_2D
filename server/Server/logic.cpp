@@ -52,3 +52,7 @@ void MoveBullets(std::vector<Bullet> &bullets, float move) {
 		MoveBullet(bullets[i], move);
 	}
 }
+
+int CheckCollision() {
+	return 0;
+}

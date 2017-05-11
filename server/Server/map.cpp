@@ -1,7 +1,7 @@
 #include "map.h"
 
 Error Map::LoadMap(unsigned &max_clients) {
-	std::ifstream fmap("../Data/Maps/2.txt");
+	std::ifstream fmap("../Data/Maps/1.txt");
 	if (!fmap) {
 		std::cerr << "Map not exist!" << std::endl;
 		return FileNotExist;

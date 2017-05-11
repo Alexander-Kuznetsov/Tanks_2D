@@ -11,6 +11,7 @@ void Client::check_packet() {
 	Network& network = Network::Instance();
 
 	while (status == sf::Socket::Status::Done) {
+		in_packet.clear();
 		status = socket.receive(in_packet); 
 		if (status == sf::Socket::Status::Disconnected) {
 			mutex.lock();
@@ -28,9 +29,15 @@ void Client::check_packet() {
 		}
 			
 		if (status == sf::Socket::Status::Done && game.GameOn == true) {
-			int key_tank, key_bullet;	
-			GetDataPacket(key_tank, key_bullet);
-			game.ImportToGame(key_tank, key_bullet, index);
+			//int key_tank, key_bullet;	
+			
+			int key;
+			//GetDataPacket(key_tank, key_bullet);
+			GetDataPacket(key);
+			//game.ImportToGame(key_tank, key_bullet, index);
+			mutex.lock();
+			game.ImportToGame(key, index);
+			mutex.lock();
 		}
 	}
 }
@@ -48,29 +55,28 @@ void Client::wait_connect(sf::TcpListener &listener) {
 }
 		
 void Client::SendDataPacket(Map DataMap, std::vector<sf::Vector2<float>> 
-	&PacketPointsTanks, std::vector<sf::Vector2<float>> &PacketPointsBullets, unsigned id) {
+	&PacketPointsTanks, std::vector<sf::Vector2<float>> &PacketPointsBullets, std::vector<RouteObject> &route_tanks, unsigned id) {
 	out_packet.clear();
 	out_packet << id;
 
-	/*out_packet << DataMap.WIDTH << DataMap.HEIGHT;
+	out_packet << DataMap.WIDTH << DataMap.HEIGHT;
 	for (unsigned i = 0; i < DataMap.WIDTH; i++) {
 		out_packet << DataMap.map[i];
-	}*/
+	}
 
 	out_packet << static_cast<unsigned int> (PacketPointsTanks.size());
 	for (unsigned i = 0; i < PacketPointsTanks.size(); i++) {
-		out_packet << PacketPointsTanks[i].x << PacketPointsTanks[i].y;
+		out_packet << PacketPointsTanks[i].x << PacketPointsTanks[i].y << route_tanks[i];
 	}
 
-	/*out_packet << static_cast<unsigned int> (PacketPointsBullets.size());
+	out_packet << static_cast<unsigned int> (PacketPointsBullets.size());
 	for (unsigned i = 0; i < PacketPointsBullets.size(); i++) {
 		out_packet << PacketPointsBullets[i].x << PacketPointsBullets[i].y;
-	}*/
+	}
 
 	socket.send(out_packet);
 }
 
-void Client::GetDataPacket(int &key_tanks, int &key_bullet) {
-	in_packet.clear();
-	in_packet >> key_tanks >> key_bullet;
+void Client::GetDataPacket(int &key) {
+	in_packet >> key;
 }
