@@ -82,8 +82,12 @@
     <ClCompile Include="client.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="errors.h" />
+    <ClInclude Include="fonts.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="map.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="tank.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
