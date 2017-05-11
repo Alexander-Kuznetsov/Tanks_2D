@@ -9,6 +9,8 @@ Game& Game::Instance() {
 	return singleton;
 }
 
+Map DataMap;
+
 void Game::wait_clients() {
 	std::cout << "Wait clients!" << std::endl;
 	Network& network = Network::Instance();
@@ -26,17 +28,19 @@ void Game::wait_clients() {
 }
 
 void Game::start_game() {
-	Map DataMap;
+	
 	Network &network = Network::Instance();
 	DataMap.LoadMap(network.max_clients);
 	speed_tank = 1;
 	speed_bullet = 2;
 
-	std::cout << "Game starts!" << std::endl;
-			
+	std::cout << "Game starts!" << std::endl;	
 	create_tanks(DataMap.PlayerPoints);
 	GameOn = true;
 
+	std::cout << "====Map====" << std::endl;	
+	for (int i = 0; i < DataMap.WIDTH; i++)
+		std::cout << DataMap.map[i] << std::endl;
 			
 	while (GameOn){
 		std::vector<sf::Vector2<float>> PacketPointsTanks;
@@ -67,8 +71,6 @@ void Game::start_game() {
 			network.clients[i]->SendDataPacket(DataMap, PacketPointsTanks, PacketPointsBullets, route_tanks,  i);
 		}
 		gameMutex.unlock();
-
-		
 	}
 }
 
@@ -87,7 +89,27 @@ void Game::destroy_tank(unsigned id) {
 }
 
 void Game::end_game() {
+	std::cout << "Game end!" << std::endl;
 	return;
+}
+
+void Game::ImportToGame(int key, unsigned id) {		
+	Network &network = Network::Instance();
+	
+	if (key == RouteObject::Space) {
+		gameMutex.lock();
+		Bullet bullet = Bullet(network.tanks[id].point.x, 
+			network.tanks[id].point.y, network.tanks[id].turn, network.tanks[id].team); 
+		network.tanks[id].bullets.push_back(bullet);
+		gameMutex.unlock();
+	}
+	else{
+		gameMutex.lock();
+		MoveTank(network.tanks[id], key, speed_tank, DataMap);
+		//MoveTank(network.tanks[id], key, speed_tank);
+		//std::cout << network.tanks[id].point.x << "   " << network.tanks[id].point.y << std::endl;
+		gameMutex.unlock();
+	}
 }
 
 /*void Game::ImportToGame(int key_tank, int key_bullet, unsigned id) {		
@@ -107,20 +129,3 @@ void Game::end_game() {
 	gameMutex.unlock();
 }*/
 
-void Game::ImportToGame(int key, unsigned id) {		
-	Network &network = Network::Instance();
-	
-	if (key == RouteObject::Space) {
-		gameMutex.lock();
-		Bullet bullet = Bullet(network.tanks[id].point.x, 
-			network.tanks[id].point.y, network.tanks[id].turn, network.tanks[id].team); 
-		network.tanks[id].bullets.push_back(bullet);
-		gameMutex.unlock();
-	}
-	else{
-		gameMutex.lock();
-		MoveTank(network.tanks[id], key, speed_tank);
-		std::cout << network.tanks[id].point.x << "   " << network.tanks[id].point.y << std::endl;
-		gameMutex.unlock();
-	}
-}

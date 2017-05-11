@@ -9,7 +9,7 @@
 int main() {
 	Game& game = Game::Instance();
 	Network& network = Network::Instance();
-	network.max_clients = 2;
+	network.max_clients = 1;
 	network.port = 2001;
 
 	if (network.listen_port(network.port) == PortNotOpen)
