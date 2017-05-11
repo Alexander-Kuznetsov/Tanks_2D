@@ -20,8 +20,8 @@ class Map {
 		}
 
 		void DrawMap(sf::RenderWindow &window) {
-			for (int i = 0; i < HEIGHT; i++){
-				for (int j = 0; j < WIDTH; j++){
+			for (unsigned i = 0; i < HEIGHT; i++){
+				for (unsigned j = 0; j < WIDTH; j++){
 					if (map[i][j] == '0') 
 						sprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
 					if (map[i][j] == '1') 

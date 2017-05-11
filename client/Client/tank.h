@@ -13,7 +13,6 @@ enum TurnObject {
 class Bullet {
 	public:
 		sf::Vector2<float> point;
-		//TurnObject turn;
 
 		sf::Image image;
 		sf::Texture texture;
@@ -21,7 +20,6 @@ class Bullet {
 
 		Bullet::Bullet (float x, float y):
 			point(x, y)
-			//turn(turn)
 		{ 
 			image.loadFromFile("../Data/Images/bullet.png");
 			texture.loadFromImage(image); 
@@ -43,7 +41,6 @@ class Tank{
 	public:
 		int HP;
 		sf::Vector2<float> point;
-		//std::vector<Bullet> bullets;
 		TurnObject turn;
 		
 		sf::Image image;
@@ -60,10 +57,7 @@ class Tank{
 			texture.loadFromImage(image); 
 			sprite.setTexture(texture);
 			spriteSize  = sprite.getLocalBounds();
-			//size_x = spriteSize.width;
-			//size_y = spriteSize.height;
-			sprite.setOrigin(spriteSize.width/2.0, spriteSize.height/2.0);
-			//sprite.setScale(0.2, 0.2);
+			sprite.setOrigin(spriteSize.width / 2.0, spriteSize.height / 2.0);
 			sprite.setPosition(point.x, point.y);
 		}
 
